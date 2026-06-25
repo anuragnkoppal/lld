@@ -1,5 +1,6 @@
 package org.elevator.elevator;
 
+import java.util.HashSet;
 import java.util.Set;
 
 import static org.elevator.elevator.Direction.DOWN;
@@ -11,7 +12,9 @@ public class Elevator {
     Set<ElevatorRequest> requestSet; // for concurrency ->     Set<ElevatorRequest> requestSet = ConcurrentHashMap.newKeySet();
 
 
-    Elevator(){}
+    Elevator(){
+        requestSet = new HashSet<>();
+    }
 
     public boolean addRequests(ElevatorRequest req){
         requestSet.add(req);
@@ -75,5 +78,32 @@ public class Elevator {
 
     Direction getDirection() {
         return direction;
+    }
+
+    private ElevatorRequest getNearestRequest(Set<ElevatorRequest> requests) {
+        ElevatorRequest nearest = null;
+        int minDistance = Integer.MAX_VALUE;
+
+        for (ElevatorRequest request : requests) {
+            int distance = Math.abs(request.floor - floor);
+            if (distance < minDistance) {
+                minDistance = distance;
+                nearest = request;
+            }
+        }
+
+        return nearest;
+    }
+
+    private boolean hasRequestsAhead() {
+        for (ElevatorRequest request : requestSet) {
+            if (direction == UP && request.floor > floor) {
+                return true;
+            }
+            if (direction == DOWN && request.floor < floor) {
+                return true;
+            }
+        }
+        return false;
     }
 }

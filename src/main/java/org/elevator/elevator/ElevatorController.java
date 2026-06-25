@@ -16,7 +16,7 @@ public class ElevatorController {
         // else find idle ones
         // else pick nearest
 
-        if(Objects.nonNull(request)){
+        if(Objects.isNull(request)){
             throw new IllegalArgumentException("Empty request");
         }
 
@@ -57,15 +57,33 @@ public class ElevatorController {
     }
 
     Elevator findIdleElevator(ElevatorRequest request) {
-        return elevators.getFirst();
+        for (Elevator elevator : elevators) {
+            if (elevator.direction == Direction.IDLE) {
+                return elevator;
+            }
+        }
+        return null;
     }
 
     Elevator findNearestElevator(ElevatorRequest request){
-        return elevators.getFirst();
+        Elevator nearest = null;
+        int minDistance = Integer.MAX_VALUE;
+
+        for (Elevator elevator : elevators) {
+            int distance = Math.abs(elevator.floor - request.floor);
+            if (distance < minDistance) {
+                nearest = elevator;
+                minDistance = distance;
+            }
+        }
+
+        return nearest;
     }
 
     void step(){
-
+        for (Elevator elevator : elevators) {
+            elevator.step();
+        }
     }
 
     ElevatorController(List<Elevator> elevators){
